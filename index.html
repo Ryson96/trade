@@ -174,9 +174,26 @@ button.lang-btn.active {
 
 .grid-stats {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    grid-template-columns: repeat(4, minmax(160px, 1fr));
     gap: 16px;
-    margin-top: 18px;
+    margin: 18px auto 0;
+    max-width: 900px;
+    align-items: start;
+}
+
+.field-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 14px 14px 12px;
+    display: grid;
+    gap: 8px;
+    min-height: 100%;
+}
+
+.grid-stats > .field-card:nth-child(1),
+.grid-stats > .field-card:nth-child(2) {
+    grid-column: span 2;
 }
 
 .field-group {
@@ -195,13 +212,13 @@ label {
 input,
 select {
     width: 100%;
-    padding: 14px 16px;
-    border-radius: 18px;
+    padding: 12px 14px;
+    border-radius: 14px;
     border: 1.5px solid var(--border);
     background: var(--surface);
     color: var(--text);
     font-weight: 600;
-    font-size: 0.98rem;
+    font-size: 0.96rem;
 }
 
 input:focus,
@@ -382,10 +399,31 @@ select option {
     font-weight: 600;
 }
 
+.calculator-help {
+    margin-top: 14px;
+    padding: 12px 14px;
+    border-radius: 16px;
+    background: rgba(37, 99, 235, 0.08);
+    color: var(--text-light);
+    font-size: 0.9rem;
+    line-height: 1.6;
+}
+
 #priceNote {
     margin-top: 14px;
     font-size: 0.9rem;
     opacity: 0.85;
+}
+
+@media (max-width: 860px) {
+    .grid-stats {
+        grid-template-columns: repeat(2, minmax(180px, 1fr));
+    }
+
+    .grid-stats > .field-card:nth-child(1),
+    .grid-stats > .field-card:nth-child(2) {
+        grid-column: span 2;
+    }
 }
 
 @media (max-width: 760px) {
@@ -396,11 +434,21 @@ select option {
     .controls {
         justify-content: center;
     }
+
 }
 
 @media (max-width: 560px) {
     h1 {
         font-size: 1.7rem;
+    }
+
+    .grid-stats {
+        grid-template-columns: 1fr;
+    }
+
+    .grid-stats > .field-card:nth-child(1),
+    .grid-stats > .field-card:nth-child(2) {
+        grid-column: span 1;
     }
 
     .price-value {
@@ -424,18 +472,23 @@ select option {
     </div>
 
     <div class="card">
-        <h2 id="calcTitle">📊 Калькулятор статов</h2>
+        <div class="calculator-help" id="calculatorHelp">Введите 4 стата, выберите существо и получите цену сразу. Цена обновляется автоматически.</div>
         <div class="grid-stats">
-            <div>
+            <div class="field-card">
                 <label id="dinoLabel">🦕 Существо</label>
                 <select id="creatureSelect"></select>
-                <div id="coeffHint" style="font-size:0.75rem; margin-top: 8px; color: var(--text-light);"></div>
             </div>
-            <div><label id="labelHealth">❤️ Здоровье</label><input type="number" id="health" value="0" step="1" min="0" max="255"></div>
-            <div><label id="labelStamina">⚡ Выносливость</label><input type="number" id="stamina" value="0" step="1" min="0" max="255"></div>
-            
-            <div><label id="labelWeight">🎒 Вес</label><input type="number" id="weight" value="0" step="1" min="0" max="255"></div>
-            <div><label id="labelMelee">⚔️ Урон</label><input type="number" id="melee" value="0" step="1" min="0" max="255"></div>
+            <div class="field-card">
+                <label id="currencyLabel">💱 Валюта</label>
+                <select id="currencySelect">
+                    <option value="points">Points</option>
+                    <option value="element">Element</option>
+                </select>
+            </div>
+            <div class="field-card"><label id="labelHealth">❤️ Здоровье</label><input type="number" id="health" value="0" step="1" min="0" max="255"></div>
+            <div class="field-card"><label id="labelStamina">⚡ Выносливость</label><input type="number" id="stamina" value="0" step="1" min="0" max="255"></div>
+            <div class="field-card"><label id="labelWeight">🎒 Вес</label><input type="number" id="weight" value="0" step="1" min="0" max="255"></div>
+            <div class="field-card"><label id="labelMelee">⚔️ Урон</label><input type="number" id="melee" value="0" step="1" min="0" max="255"></div>
         </div>
         <div class="flex-between">
             <span class="total-stats" id="totalLabel">📈 Сумма статов:</span>
@@ -657,6 +710,7 @@ select option {
     COEFF_5_LIST.forEach(name => creaturesData.set(name, 5));
     COEFF_7_5_LIST.forEach(name => creaturesData.set(name, 7.5));
     COEFF_10_LIST.forEach(name => creaturesData.set(name, 10));
+    const POINTS_TO_ELEMENT_RATIO = 10;
 
     function getDisplayName(russianName, lang) {
         if (lang === 'en' && creatureNameEn.has(russianName)) {
@@ -744,18 +798,23 @@ select option {
 
         const selected = document.getElementById("creatureSelect").value;
         const coeff = creaturesData.get(selected) || 2.5;
+        const currency = document.getElementById("currencySelect").value;
         const castPrice = totalPoints * coeff * (2/3);
         const uncastPrice = castPrice * 1.5;
 
         const floorCast = Math.floor(castPrice);
         const floorUncast = Math.floor(uncastPrice);
-        document.getElementById("castPrice").textContent = floorCast;
-        document.getElementById("uncastPrice").textContent = floorUncast;
+        const castDisplay = currency === 'element' ? Math.floor(castPrice * POINTS_TO_ELEMENT_RATIO) : floorCast;
+        const uncastDisplay = currency === 'element' ? Math.floor(uncastPrice * POINTS_TO_ELEMENT_RATIO) : floorUncast;
+        document.getElementById("castPrice").textContent = castDisplay;
+        document.getElementById("uncastPrice").textContent = uncastDisplay;
 
-        const priceWord = (currentLang === 'en') ? 'Price' : 'Цена';
-        document.getElementById("coeffHint").innerHTML = `💰 ${priceWord}: ${coeff} ${currentLang === 'en' ? 'Points per stat' : 'Points за 1 стат'} × ⅔`;
-        document.getElementById("castFormula").innerHTML = `${totalPoints} × ${coeff} × ⅔ = ${floorCast} pts`;
-        document.getElementById("uncastFormula").innerHTML = `${floorCast} × 1.5 = ${floorUncast} pts`;
+        const currencyText = (currency === 'element') ? ((currentLang === 'en') ? 'Element' : 'Элемент') : 'Points';
+        document.getElementById("calculatorHelp").textContent = (currentLang === 'en')
+            ? 'Enter 4 stats, choose a creature, and get the price instantly. The price updates automatically.'
+            : 'Введите 4 стата, выберите существо и получите цену сразу. Цена обновляется автоматически.';
+        document.getElementById("castFormula").innerHTML = `${totalPoints} × ${coeff} × ⅔ = ${floorCast} pts${currency === 'element' ? ` → ${castDisplay} ${currencyText}` : ''}`;
+        document.getElementById("uncastFormula").innerHTML = `${floorCast} × 1.5 = ${floorUncast} pts${currency === 'element' ? ` → ${uncastDisplay} ${currencyText}` : ''}`;
 
         const hasHighStat = stats.some(s => s >= 100);
         const warningsDiv = document.getElementById("warningsContainer");
@@ -786,18 +845,19 @@ select option {
         ru: {
             title: "🦖 ARK Калькулятор статов",
             calcTitle: "📊 Калькулятор статов",
-            resultTitle: "💰 Итоговая цена (Points)",
+            resultTitle: "💰 Итоговая цена (Points / Element)",
             totalLabel: "📈 Сумма статов:",
             castLabel: "🔒 Кастрат",
             uncastLabel: "🔓 Некастрат",
             rulesTitle: "📜 Торговый регламент",
             listTitle: "📋 Список существ (по категориям)",
             rule1: "Цена калькулятора — базовая рекомендация для продажи динозавра. Можно ставить дороже, но не ниже.",
-            rule2: "Валюта — Points (очки за стат).",
+            rule2: "Валюта — Points или Element.",
             rule3: "Некастраты с любым статом ≥100 ⛔ строго запрещены к продаже.",
             rule4: "Каждое существо имеет базовый коэффициент 2.5/5/7.5/10 Points за 1 стат; итоговая цена = сумма × коэфф. × ⅔.",
             rule5: "⚠️ За нарушение минимальной цены или бесплатную передачу динозавра другому игроку вне вашего трайба может быть выдан бан.",
             dinoLabel: "🦕 Существо",
+            currencyLabel: "💱 Валюта",
             labelHealth: "❤️ Здоровье",
             labelStamina: "⚡ Выносливость",
             labelOxygen: "💨 Кислород",
@@ -805,23 +865,24 @@ select option {
             labelWeight: "🎒 Вес",
             labelMelee: "⚔️ Урон",
             labelSpeed: "🏃 Скорость",
-            priceNote: "⚡ Минимальная цена — можно выше. Валюта: Points (очки за стат)"
+            priceNote: "⚡ Минимальная цена — можно выше. Валюта: Points или Element."
         },
         en: {
             title: "🦖 ARK Stat Calculator",
             calcTitle: "📊 Stat Calculator",
-            resultTitle: "💰 Final Price (Points)",
+            resultTitle: "💰 Final Price (Points / Element)",
             totalLabel: "📈 Total Stats:",
             castLabel: "🔒 Neutered",
             uncastLabel: "🔓 Unneutered",
             rulesTitle: "📜 Trading Rules",
             listTitle: "📋 Creature List (by category)",
             rule1: "Calculator price is a base recommendation for selling a dinosaur. You can price higher, but not lower.",
-            rule2: "Currency — Points (per stat).",
+            rule2: "Currency — Points or Element.",
             rule3: "Unneutered with any stat ≥100 ⛔ is strictly forbidden for sale.",
             rule4: "Each creature has base coefficient (2.5/5/7.5/10 Points per stat), final price = sum × coeff × ⅔.",
             rule5: "⚠️ Violation of the minimum price or giving away a dinosaur for free to another player outside your tribe may result in a ban!",
             dinoLabel: "🦕 Creature",
+            currencyLabel: "💱 Currency",
             labelHealth: "❤️ Health",
             labelStamina: "⚡ Stamina",
             labelOxygen: "💨 Oxygen",
@@ -829,7 +890,7 @@ select option {
             labelWeight: "🎒 Weight",
             labelMelee: "⚔️ Melee",
             labelSpeed: "🏃 Speed",
-            priceNote: "⚡ Minimum price — you can trade higher. Currency: Points (per stat)"
+            priceNote: "⚡ Minimum price — you can trade higher. Currency: Points or Element."
         }
     };
 
@@ -851,7 +912,10 @@ select option {
         updateLanguageButtons();
         const t = translations[lang];
         document.getElementById("title").textContent = t.title;
-        document.getElementById("calcTitle").textContent = t.calcTitle;
+        const calcTitleEl = document.getElementById("calcTitle");
+        if (calcTitleEl) {
+            calcTitleEl.textContent = t.calcTitle;
+        }
         document.getElementById("resultTitle").textContent = t.resultTitle;
         document.getElementById("totalLabel").textContent = t.totalLabel;
         document.getElementById("castLabel").textContent = t.castLabel;
@@ -859,6 +923,7 @@ select option {
         document.getElementById("rulesTitle").textContent = t.rulesTitle;
         document.getElementById("listTitle").textContent = t.listTitle;
         document.getElementById("dinoLabel").textContent = t.dinoLabel;
+        document.getElementById("currencyLabel").textContent = t.currencyLabel;
         document.getElementById("labelHealth").textContent = t.labelHealth;
         document.getElementById("labelStamina").textContent = t.labelStamina;
         const elO = document.getElementById("labelOxygen"); if (elO) elO.textContent = t.labelOxygen;
@@ -867,6 +932,9 @@ select option {
         document.getElementById("labelMelee").textContent = t.labelMelee;
         const elS = document.getElementById("labelSpeed"); if (elS) elS.textContent = t.labelSpeed;
         document.getElementById("priceNote").innerHTML = t.priceNote;
+        const currencySelect = document.getElementById("currencySelect");
+        currencySelect.querySelector('option[value="points"]').textContent = 'Points';
+        currencySelect.querySelector('option[value="element"]').textContent = (lang === 'en') ? 'Element' : 'Элемент';
         const ruleItems = document.querySelectorAll("#rulesList li");
         if (ruleItems.length >= 5) {
             ruleItems[0].textContent = t.rule1;
@@ -892,9 +960,20 @@ select option {
         if (savedTheme === "dark") document.body.classList.add("dark");
         updateThemeButton();
         const savedLang = localStorage.getItem("ark_lang");
+        const savedCurrency = localStorage.getItem("ark_currency");
         setLanguage(savedLang === "en" ? "en" : "ru");
+        const currencySelect = document.getElementById("currencySelect");
+        if (savedCurrency === "element") {
+            currencySelect.value = "element";
+        } else {
+            currencySelect.value = "points";
+        }
         const inputs = document.querySelectorAll("input[type=number], select");
         inputs.forEach(inp => inp.addEventListener("input", calculate));
+        currencySelect.addEventListener("change", () => {
+            localStorage.setItem("ark_currency", currencySelect.value);
+            calculate();
+        });
         calculate();
     }
 
