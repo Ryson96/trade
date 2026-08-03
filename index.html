@@ -782,7 +782,7 @@ select option {
             rule1: "Цена калькулятора — базовая рекомендация для продажи динозавра. Можно ставить дороже, но не ниже.",
             rule2: "Валюта — Points или Element (Points = Element × 5).",
             rule3: "Некастраты с любым статом ≥100 ⛔ строго запрещены к продаже.",
-            rule4: "Каждое существо имеет базовый коэффициент 2/4/6/8 Points за 1 стат; итоговая цена = эффективное значение статов × коэфф. × ⅔.",
+            rule4: "Каждое существо имеет базовый коэффициент <span class=\"coeff-2\">2</span>/<span class=\"coeff-4\">4</span>/<span class=\"coeff-6\">6</span>/<span class=\"coeff-8\">8</span> Points за 1 стат; итоговая цена = эффективное значение статов × коэфф. × ⅔.",
             creaturePlaceholder: "Тип не выбран",
             creatureNotListed: "Дино нет в списке",
             rule5: "⚠️ За нарушение минимальной цены или бесплатную передачу динозавра другому игроку вне вашего трайба может быть выдан бан.",
@@ -810,7 +810,7 @@ select option {
             rule1: "Calculator price is a base recommendation for selling a dinosaur. You can price higher, but not lower.",
             rule2: "Currency — Points or Element (Points = Element × 5).",
             rule3: "Unneutered with any stat ≥100 ⛔ is strictly forbidden for sale.",
-            rule4: "Each creature has base coefficient (2/4/6/8 Points per stat); final price = effective stat value × coeff × ⅔.",
+            rule4: "Each creature has a base coefficient <span class=\"coeff-2\">2</span>/<span class=\"coeff-4\">4</span>/<span class=\"coeff-6\">6</span>/<span class=\"coeff-8\">8</span> Points per stat; final price = effective stat value × coeff × ⅔.",
             creaturePlaceholder: "No type selected",
             creatureNotListed: "Dino not listed",
             rule5: "⚠️ Violation of the minimum price or giving away a dinosaur for free to another player outside your tribe may result in a ban!",
@@ -874,8 +874,8 @@ select option {
             ruleItems[0].textContent = t.rule1;
             ruleItems[1].textContent = t.rule2;
             ruleItems[2].textContent = t.rule3;
-            // rule4 содержит HTML с цветными цифрами
-            ruleItems[3].innerHTML = `Каждое существо имеет базовый коэффициент <span class="coeff-2">2</span>/<span class="coeff-4">4</span>/<span class="coeff-6">6</span>/<span class="coeff-8">8</span> Points за 1 стат; итоговая цена = эффективное значение статов × коэфф. × ⅔.`;
+            // rule4 теперь использует правильный перевод из translations
+            ruleItems[3].innerHTML = t.rule4;
             ruleItems[4].innerHTML = t.rule5;
             ruleItems[5].innerHTML = t.rule6;
         }
