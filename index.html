@@ -1,9 +1,9 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-<title>ARK Dino Calculator — Points за стат</title>
+<title>ARK Калькулятор для продажи дино</title>
 <style>
 * {
     margin: 0;
@@ -298,11 +298,12 @@ select option {
 
 .flex-between {
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
     align-items: center;
     gap: 16px;
     flex-wrap: wrap;
     margin-top: 24px;
+    text-align: center;
 }
 
 .rules-list {
@@ -333,62 +334,6 @@ select option {
     padding: 18px 20px;
 }
 
-.species-grid {
-    display: grid;
-    grid-template-columns: repeat(4, minmax(200px, 1fr));
-    gap: 25px;
-    margin-top: 16px;
-}
-
-@media (max-width: 1024px) {
-    .species-grid {
-        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    }
-}
-
-.species-category {
-    background: var(--bg-app);
-    border-radius: 20px;
-    padding: 25px;
-    border: 1px solid var(--border);
-    display: flex;
-    flex-direction: column;
-    height: 320px;
-    max-height: 60vh;
-    overflow: hidden;
-}
-
-.species-category h4 {
-    font-size: 1.1rem;
-    margin-bottom: 15px;
-    padding-bottom: 10px;
-    border-bottom: 2px solid var(--border);
-    font-weight: 800;
-    color: var(--text);
-}
-
-.species-list {
-    list-style: none;
-    columns: 2;
-    column-gap: 20px;
-    margin: 0;
-    padding: 0 8px 0 0;
-    overflow-y: auto;
-    flex: 1 1 auto;
-}
-
-.species-list li {
-    font-size: 0.92rem;
-    color: var(--text-light);
-    padding: 4px 0;
-    break-inside: avoid;
-}
-
-.cat-2-5 h4 { color: var(--color-coeff5); border-color: var(--color-coeff5); }
-.cat-5 h4 { color: var(--color-coeff10); border-color: var(--color-coeff10); }
-.cat-7-5 h4 { color: var(--color-coeff15); border-color: var(--color-coeff15); }
-.cat-10 h4 { color: var(--color-coeff20); border-color: var(--color-coeff20); }
-
 .warning-box {
     margin-top: 18px;
     background: var(--warning-bg);
@@ -407,6 +352,7 @@ select option {
     color: var(--text-light);
     font-size: 0.9rem;
     line-height: 1.6;
+    text-align: center;
 }
 
 #priceNote {
@@ -462,7 +408,7 @@ select option {
 <div class="container">
     <div class="header">
         <div class="header-left">
-            <h1 id="title">🦖 ARK Калькулятор статов</h1>
+            <h1 id="title">🦖 ARK Калькулятор для продажи дино</h1>
         </div>
         <div class="controls">
             <button class="lang-btn active" data-lang="ru" onclick="setLanguage('ru')">RU</button>
@@ -502,7 +448,7 @@ select option {
             <div class="price-card">
                 <h3 id="castLabel">🔒 Кастрат</h3>
                 <div class="price-value" id="castPrice">0</div>
-                <div style="margin-top: 8px; font-size:0.8rem;" id="castFormula">сумма × коэфф. × ⅔</div>
+                <div style="margin-top: 8px; font-size:0.8rem;" id="castFormula">эффективное значение статов × коэфф. × ⅔</div>
             </div>
             <div class="price-card">
                 <h3 id="uncastLabel">🔓 Некастрат</h3>
@@ -520,50 +466,44 @@ select option {
             <li id="rule1">Цена калькулятора — базовая рекомендация для продажи динозавра. Можно ставить дороже, но не ниже.</li>
             <li id="rule2">Валюта — Points (очки за стат).</li>
             <li id="rule3">Некастраты с любым статом ≥100 ⛔ строго запрещены к продаже.</li>
-            <li id="rule4">Каждое существо имеет базовый коэффициент 2.5/5/7.5/10 Points за 1 стат; итоговая цена = сумма × коэфф. × ⅔.</li>
+            <li id="rule4">Каждое существо имеет базовый коэффициент 2/4/6/8 Points за 1 стат; итоговая цена = эффективное значение статов × коэфф. × ⅔.</li>
             <li id="rule5" class="ban-rule" style="list-style: none; padding-left: 16px;">⚠️ За нарушение минимальной цены или бесплатную передачу динозавра другому игроку вне вашего трайба может быть выдан бан.</li>
         </ul>
-    </div>
-
-    <div class="card">
-        <h2 id="listTitle">📋 Список существ (по категориям)</h2>
-        <div id="speciesContainer" class="species-grid"></div>
     </div>
 </div>
 
 <script>
     // ---------- ТОЧНЫЕ СПИСКИ СУЩЕСТВ (русские имена) ----------
-    // Базовые коэффициенты уменьшены вдвое: 2.5, 5, 7.5, 10
-    const COEFF_2_5_LIST = [
-        "Аксолотль", "Археоптерикс", "Ахатина", "Выдра", "Гесперорнис", "Гриф", "Дилофозавр", "Диморфодон", "Додо", "Ихтиорнис",
+    // Базовые значения за 1 стат: 2, 4, 6, 8 Points; 10, 20, 30, 40 Element
+    const COEFF_2_LIST = [
+        "Археоптерикс", "Ахатина", "Выдра", "Гесперорнис", "Гриф", "Дилофозавр", "Диморфодон", "Додо", "Ихтиорнис",
         "Кайруку", "Компсогнат", "Королева пчёл", "Листрозавр", "Мезопитек", "Микрораптор", "Ноглин", "Овираптор", "Пегомастакс",
         "Светорог", "Синомакропс", "Скарабей", "Яснокрыл", "Ястреб фьердов"
     ];
-    const COEFF_5_LIST = [
+    const COEFF_4_LIST = [
         "Аллозавр", "Амаргазавр", "Аранео", "Аргентавис", "Артроплевра", "Астродельфис", "Барионикс", "Большерогий олень",
-        "Вулканит", "Газбагс", "Галлимим", "Гигантопитек", "Гиенодон", "Диметродон", "Динопитек", "Диплодок", "Диплокаулус",
+        "Газбагс", "Галлимим", "Гигантопитек", "Гиенодон", "Диметродон", "Динопитек", "Диплодок", "Диплокаулус",
         "Дунклеостей", "Жаба", "Игуанодон", "Инфорсер", "Ихтиозавр", "Капрозух", "Карбонемис", "Карнотавр", "Кентрозавр",
         "Лиоплевродон", "Лютоволк", "Мамонт", "Мегалания", "Мегалодон", "Мегалозавр", "Мореллатопс", "Оник", "Опустошитель", "Паразавр",
         "Парацетерий", "Пахиринозавр", "Пахицефалозавр", "Пелагорнис", "Прокоптодон", "Птеранодон", "Пурловия", "Раптор",
         "Саблезуб", "Саркозух", "Скорпион", "Стегозавр", "Тапежара", "Титанобоа", "Титанозавр", "Трицератопс", "Троодон",
         "Тропеогнат", "Ужасная птица", "Фиомия", "Халикотерий", "Шелкопряд", "Шипастый дракон", "Эквус", "Электрофорус"
     ];
-    const COEFF_7_5_LIST = [
-        "Анкилозавр", "Бладсталкер", "Богомол", "Бронтозавр", "Василиск", "Велоназавр", "Виверны", "Водяная виверна",
-        "Войдверна", "Гигантораптор", "Грифон", "Дедикурус", "Дейноних", "Деодон", "Десмодус", "Каркинос", "Кастороидес",
-        "Кристальная виверна", "Манагармр", "Мегараптор", "Мегатерий", "Мегахелон", "Мейвинг", "Мосхопс",
-        "Свирепый медведь", "Скальный дрейк", "Снежная сова", "Спинозавр", "Сумчатый лев", "Тенегрив", "Тиранозавр", "Титаны",
+    const COEFF_6_LIST = [
+        "Анкилозавр", "Бладсталкер", "Богомол", "Бронтозавр", "Василиск", "Велоназавр", "Виверны",
+        "Гигантораптор", "Грифон", "Дедикурус", "Дейноних", "Деодон", "Десмодус", "Каркинос", "Кастороидес",
+        "Манагармр", "Мегараптор", "Мегатерий", "Мегахелон", "Мейвинг", "Мосхопс",
+        "Свирепый медведь", "Скальный дрейк", "Снежная сова", "Спинозавр", "Сумчатый лев", "Тенегрив", "Тиранозавр",
         "Удильщик", "Феникс", "Фенрир", "Ферокс", "Шерстистый носорог", "Эндрюсарх"
     ];
-    const COEFF_10_LIST = [
-        "Астроцетус", "Базилозавр", "Гача", "Гиганотозавр", "Голем", "Кархародонтозавр", "Кетцалькоатль", "Король жнец",
+    const COEFF_8_LIST = [
+        "Астроцетус", "Базилозавр", "Гача", "Гиганотозавр", "Кархародонтозавр", "Кетцалькоатль", "Король жнец",
         "Магмазавр", "Мозазавр", "Риниогната", "Теризинозавр", "Тусотеутис", "Ютираннус"
     ];
 
     // Маппинг русских названий на английские
     const creatureNameEn = new Map();
-    // 2.5 points
-    creatureNameEn.set("Аксолотль", "Axolotl");
+    // 2 points
     creatureNameEn.set("Археоптерикс", "Archaeopteryx");
     creatureNameEn.set("Ахатина", "Achatina");
     creatureNameEn.set("Выдра", "Otter");
@@ -587,7 +527,7 @@ select option {
     creatureNameEn.set("Скарабей", "Scarab");
     creatureNameEn.set("Яснокрыл", "Glowtail");
     creatureNameEn.set("Ястреб фьердов", "Fjordhawk");
-    // 5 points
+    // 4 points
     creatureNameEn.set("Аллозавр", "Allosaurus");
     creatureNameEn.set("Амаргазавр", "Amargasaurus");
     creatureNameEn.set("Аранео", "Araneo");
@@ -596,7 +536,6 @@ select option {
     creatureNameEn.set("Астродельфис", "Astrodelphis");
     creatureNameEn.set("Барионикс", "Baryonyx");
     creatureNameEn.set("Большерогий олень", "Megaloceros");
-    creatureNameEn.set("Вулканит", "Vulcan");
     creatureNameEn.set("Газбагс", "Gasbags");
     creatureNameEn.set("Галлимим", "Gallimimus");
     creatureNameEn.set("Гигантопитек", "Gigantopithecus");
@@ -649,7 +588,7 @@ select option {
     creatureNameEn.set("Шипастый дракон", "Thorny Dragon");
     creatureNameEn.set("Эквус", "Equus");
     creatureNameEn.set("Электрофорус", "Electrophorus");
-    // 7.5 points
+    // 6 points
     creatureNameEn.set("Анкилозавр", "Ankylosaurus");
     creatureNameEn.set("Бладсталкер", "Bloodstalker");
     creatureNameEn.set("Богомол", "Mantis");
@@ -657,8 +596,6 @@ select option {
     creatureNameEn.set("Василиск", "Basilisk");
     creatureNameEn.set("Велоназавр", "Velonasaur");
     creatureNameEn.set("Виверны", "Wyvern");
-    creatureNameEn.set("Водяная виверна", "Water Wyvern");
-    creatureNameEn.set("Войдверна", "Voidwyrm");
     creatureNameEn.set("Гигантораптор", "Gigantoraptor");
     creatureNameEn.set("Грифон", "Griffin");
     creatureNameEn.set("Дедикурус", "Doedicurus");
@@ -667,7 +604,6 @@ select option {
     creatureNameEn.set("Десмодус", "Desmodus");
     creatureNameEn.set("Каркинос", "Karkinos");
     creatureNameEn.set("Кастороидес", "Castoroides");
-    creatureNameEn.set("Кристальная виверна", "Crystal Wyvern");
     creatureNameEn.set("Манагармр", "Managarmr");
     creatureNameEn.set("Мегараптор", "Megaraptor");
     creatureNameEn.set("Мегатерий", "Megatherium");
@@ -681,19 +617,17 @@ select option {
     creatureNameEn.set("Сумчатый лев", "Thylacoleo");
     creatureNameEn.set("Тенегрив", "Shadowmane");
     creatureNameEn.set("Тиранозавр", "Rex");
-    creatureNameEn.set("Титаны", "Titans");
     creatureNameEn.set("Удильщик", "Anglerfish");
     creatureNameEn.set("Феникс", "Phoenix");
     creatureNameEn.set("Фенрир", "Fenrir");
     creatureNameEn.set("Ферокс", "Ferox");
     creatureNameEn.set("Шерстистый носорог", "Woolly Rhino");
     creatureNameEn.set("Эндрюсарх", "Andrewsarchus");
-    // 10 points
+    // 8 points
     creatureNameEn.set("Астроцетус", "Astrocetus");
     creatureNameEn.set("Базилозавр", "Basilosaurus");
     creatureNameEn.set("Гача", "Gacha");
     creatureNameEn.set("Гиганотозавр", "Giganotosaurus");
-    creatureNameEn.set("Голем", "Golem");
     creatureNameEn.set("Кархародонтозавр", "Carcharodontosaurus");
     creatureNameEn.set("Кетцалькоатль", "Quetzalcoatlus");
     creatureNameEn.set("Король жнец", "Reaper");
@@ -704,13 +638,12 @@ select option {
     creatureNameEn.set("Тусотеутис", "Tusoteuthis");
     creatureNameEn.set("Ютираннус", "Yutyrannus");
 
-    // Сборная карта всех существ {русское имя: coeff} (теперь дробные)
+    // Сборная карта всех существ {русское имя: coeff} (Points за 1 стат)
     const creaturesData = new Map();
-    COEFF_2_5_LIST.forEach(name => creaturesData.set(name, 2.5));
-    COEFF_5_LIST.forEach(name => creaturesData.set(name, 5));
-    COEFF_7_5_LIST.forEach(name => creaturesData.set(name, 7.5));
-    COEFF_10_LIST.forEach(name => creaturesData.set(name, 10));
-    const POINTS_TO_ELEMENT_RATIO = 10;
+    COEFF_2_LIST.forEach(name => creaturesData.set(name, 2));
+    COEFF_4_LIST.forEach(name => creaturesData.set(name, 4));
+    COEFF_6_LIST.forEach(name => creaturesData.set(name, 6));
+    COEFF_8_LIST.forEach(name => creaturesData.set(name, 8));
 
     function getDisplayName(russianName, lang) {
         if (lang === 'en' && creatureNameEn.has(russianName)) {
@@ -722,9 +655,9 @@ select option {
     function getSortedCreatureNames(lang) {
         const groups = [[], [], [], []];
         for (let [name, coeff] of creaturesData.entries()) {
-            if (coeff === 2.5) groups[0].push(name);
-            else if (coeff === 5) groups[1].push(name);
-            else if (coeff === 7.5) groups[2].push(name);
+            if (coeff === 2) groups[0].push(name);
+            else if (coeff === 4) groups[1].push(name);
+            else if (coeff === 6) groups[2].push(name);
             else groups[3].push(name);
         }
         groups.forEach(g => g.sort((a,b) => a.localeCompare(b)));
@@ -736,13 +669,23 @@ select option {
         const select = document.getElementById("creatureSelect");
         const currentValue = select.value;
         select.innerHTML = '';
+        const placeholder = document.createElement('option');
+        placeholder.value = '';
+        placeholder.textContent = translations[lang].creaturePlaceholder;
+        placeholder.style.color = 'var(--text-light)';
+        select.appendChild(placeholder);
+        const notListedOption = document.createElement('option');
+        notListedOption.value = 'not-listed';
+        notListedOption.textContent = translations[lang].creatureNotListed;
+        notListedOption.style.color = 'var(--text-light)';
+        select.appendChild(notListedOption);
         const items = getSortedCreatureNames(lang);
         items.forEach(item => {
             const coeff = creaturesData.get(item.value);
             let color = '';
-            if (coeff === 2.5) color = 'var(--color-coeff5)';
-            else if (coeff === 5) color = 'var(--color-coeff10)';
-            else if (coeff === 7.5) color = 'var(--color-coeff15)';
+            if (coeff === 2) color = 'var(--color-coeff5)';
+            else if (coeff === 4) color = 'var(--color-coeff10)';
+            else if (coeff === 6) color = 'var(--color-coeff15)';
             else color = 'var(--color-coeff20)';
             const option = document.createElement('option');
             option.value = item.value;
@@ -750,41 +693,11 @@ select option {
             option.style.color = color;
             select.appendChild(option);
         });
-        if (currentValue && [...creaturesData.keys()].includes(currentValue)) {
+        if (currentValue && ([...creaturesData.keys(), 'not-listed'].includes(currentValue))) {
             select.value = currentValue;
+        } else {
+            select.value = '';
         }
-    }
-
-    function renderSpeciesList(lang) {
-        const container = document.getElementById("speciesContainer");
-        const labels = {
-            ru: ["по 2.5 Points за 1 стат", "по 5 Points за 1 стат", "по 7.5 Points за 1 стат", "по 10 Points за 1 стат"],
-            en: ["2.5 Points per stat", "5 Points per stat", "7.5 Points per stat", "10 Points per stat"]
-        };
-        const categories = [
-            { list: COEFF_2_5_LIST, color: 'var(--color-coeff5)' },
-            { list: COEFF_5_LIST, color: 'var(--color-coeff10)' },
-            { list: COEFF_7_5_LIST, color: 'var(--color-coeff15)' },
-            { list: COEFF_10_LIST, color: 'var(--color-coeff20)' }
-        ];
-        container.innerHTML = '';
-        categories.forEach((cat, idx) => {
-            const catDiv = document.createElement('div');
-            const categoryClass = ['cat-2-5', 'cat-5', 'cat-7-5', 'cat-10'][idx];
-            catDiv.className = `species-category ${categoryClass}`;
-            const title = document.createElement('h4');
-            title.textContent = labels[lang][idx];
-            catDiv.appendChild(title);
-            const ul = document.createElement('ul');
-            ul.className = 'species-list';
-            cat.list.forEach(rusName => {
-                const li = document.createElement('li');
-                li.textContent = getDisplayName(rusName, lang);
-                ul.appendChild(li);
-            });
-            catDiv.appendChild(ul);
-            container.appendChild(catDiv);
-        });
     }
 
     function calculate() {
@@ -797,23 +710,32 @@ select option {
         document.getElementById("totalValue").textContent = totalPoints;
 
         const selected = document.getElementById("creatureSelect").value;
-        const coeff = creaturesData.get(selected) || 2.5;
+        const maxCoeff = 8;
+        const minCoeff = 2;
+        const coeff = selected === 'not-listed'
+            ? minCoeff
+            : selected
+                ? (creaturesData.get(selected) || 2)
+                : maxCoeff;
         const currency = document.getElementById("currencySelect").value;
-        const castPrice = totalPoints * coeff * (2/3);
+        const effectivePoints = stats.reduce((sum, value) => sum + Math.pow(value, 2.2), 0) / 50;
+        const castPrice = effectivePoints * coeff * (2/3);
         const uncastPrice = castPrice * 1.5;
 
         const floorCast = Math.floor(castPrice);
         const floorUncast = Math.floor(uncastPrice);
-        const castDisplay = currency === 'element' ? Math.floor(castPrice * POINTS_TO_ELEMENT_RATIO) : floorCast;
-        const uncastDisplay = currency === 'element' ? Math.floor(uncastPrice * POINTS_TO_ELEMENT_RATIO) : floorUncast;
+        const elementRatio = 5; // Element price is always 5× the Points price
+        const castDisplay = currency === 'element' ? Math.floor(castPrice * elementRatio) : floorCast;
+        const uncastDisplay = currency === 'element' ? Math.floor(uncastPrice * elementRatio) : floorUncast;
         document.getElementById("castPrice").textContent = castDisplay;
         document.getElementById("uncastPrice").textContent = uncastDisplay;
 
-        const currencyText = (currency === 'element') ? ((currentLang === 'en') ? 'Element' : 'Элемент') : 'Points';
+        const currencyText = (currency === 'element') ? ((currentLang === 'en') ? 'Element' : 'Элемент') : ((currentLang === 'en') ? 'Points' : 'Points');
+        document.getElementById("resultTitle").textContent = `${translations[currentLang].resultTitle} (${currencyText})`;
         document.getElementById("calculatorHelp").textContent = (currentLang === 'en')
             ? 'Enter 4 stats, choose a creature, and get the price instantly. The price updates automatically.'
             : 'Введите 4 стата, выберите существо и получите цену сразу. Цена обновляется автоматически.';
-        document.getElementById("castFormula").innerHTML = `${totalPoints} × ${coeff} × ⅔ = ${floorCast} pts${currency === 'element' ? ` → ${castDisplay} ${currencyText}` : ''}`;
+        document.getElementById("castFormula").innerHTML = `effective stat value × ${coeff} × ⅔ = ${floorCast} pts${currency === 'element' ? ` → ${castDisplay} ${currencyText}` : ''}`;
         document.getElementById("uncastFormula").innerHTML = `${floorCast} × 1.5 = ${floorUncast} pts${currency === 'element' ? ` → ${uncastDisplay} ${currencyText}` : ''}`;
 
         const hasHighStat = stats.some(s => s >= 100);
@@ -843,18 +765,20 @@ select option {
 
     const translations = {
         ru: {
-            title: "🦖 ARK Калькулятор статов",
+            title: "🦖 ARK Калькулятор для продажи дино",
             calcTitle: "📊 Калькулятор статов",
-            resultTitle: "💰 Итоговая цена (Points / Element)",
+            resultTitle: "💰 Итоговая цена",
             totalLabel: "📈 Сумма статов:",
             castLabel: "🔒 Кастрат",
             uncastLabel: "🔓 Некастрат",
             rulesTitle: "📜 Торговый регламент",
             listTitle: "📋 Список существ (по категориям)",
             rule1: "Цена калькулятора — базовая рекомендация для продажи динозавра. Можно ставить дороже, но не ниже.",
-            rule2: "Валюта — Points или Element.",
+            rule2: "Валюта — Points или Element (Points = Element × 5).",
             rule3: "Некастраты с любым статом ≥100 ⛔ строго запрещены к продаже.",
-            rule4: "Каждое существо имеет базовый коэффициент 2.5/5/7.5/10 Points за 1 стат; итоговая цена = сумма × коэфф. × ⅔.",
+            rule4: "Каждое существо имеет базовый коэффициент 2/4/6/8 Points за 1 стат; итоговая цена = эффективное значение статов × коэфф. × ⅔.",
+            creaturePlaceholder: "Тип не выбран",
+            creatureNotListed: "Дино нет в списке",
             rule5: "⚠️ За нарушение минимальной цены или бесплатную передачу динозавра другому игроку вне вашего трайба может быть выдан бан.",
             dinoLabel: "🦕 Существо",
             currencyLabel: "💱 Валюта",
@@ -868,18 +792,20 @@ select option {
             priceNote: "⚡ Минимальная цена — можно выше. Валюта: Points или Element."
         },
         en: {
-            title: "🦖 ARK Stat Calculator",
+            title: "🦖 ARK Calculator for selling dinos",
             calcTitle: "📊 Stat Calculator",
-            resultTitle: "💰 Final Price (Points / Element)",
+            resultTitle: "💰 Final Price",
             totalLabel: "📈 Total Stats:",
             castLabel: "🔒 Neutered",
             uncastLabel: "🔓 Unneutered",
             rulesTitle: "📜 Trading Rules",
             listTitle: "📋 Creature List (by category)",
             rule1: "Calculator price is a base recommendation for selling a dinosaur. You can price higher, but not lower.",
-            rule2: "Currency — Points or Element.",
+            rule2: "Currency — Points or Element (Points = Element × 5).",
             rule3: "Unneutered with any stat ≥100 ⛔ is strictly forbidden for sale.",
-            rule4: "Each creature has base coefficient (2.5/5/7.5/10 Points per stat), final price = sum × coeff × ⅔.",
+            rule4: "Each creature has base coefficient (2/4/6/8 Points per stat); final price = effective stat value × coeff × ⅔.",
+            creaturePlaceholder: "No type selected",
+            creatureNotListed: "Dino not listed",
             rule5: "⚠️ Violation of the minimum price or giving away a dinosaur for free to another player outside your tribe may result in a ban!",
             dinoLabel: "🦕 Creature",
             currencyLabel: "💱 Currency",
@@ -912,6 +838,7 @@ select option {
         updateLanguageButtons();
         const t = translations[lang];
         document.getElementById("title").textContent = t.title;
+        document.title = t.title;
         const calcTitleEl = document.getElementById("calcTitle");
         if (calcTitleEl) {
             calcTitleEl.textContent = t.calcTitle;
@@ -921,7 +848,6 @@ select option {
         document.getElementById("castLabel").textContent = t.castLabel;
         document.getElementById("uncastLabel").textContent = t.uncastLabel;
         document.getElementById("rulesTitle").textContent = t.rulesTitle;
-        document.getElementById("listTitle").textContent = t.listTitle;
         document.getElementById("dinoLabel").textContent = t.dinoLabel;
         document.getElementById("currencyLabel").textContent = t.currencyLabel;
         document.getElementById("labelHealth").textContent = t.labelHealth;
@@ -944,7 +870,6 @@ select option {
             ruleItems[4].innerHTML = t.rule5;
         }
         populateSelect(lang);
-        renderSpeciesList(lang);
         calculate();
         localStorage.setItem("ark_lang", lang);
     }
