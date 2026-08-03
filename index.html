@@ -474,6 +474,8 @@ select option {
             <li id="rule4">Каждое существо имеет базовый коэффициент <span class="coeff-2">2</span>/<span class="coeff-4">4</span>/<span class="coeff-6">6</span>/<span class="coeff-8">8</span> Points за 1 стат; итоговая цена = эффективное значение статов × коэфф. × ⅔.</li>
             <li id="rule5" class="ban-rule" style="list-style: none; padding-left: 16px;">⚠️ За нарушение минимальной цены или бесплатную передачу динозавра другому игроку вне вашего трайба может быть выдан бан.</li>
             <li id="rule6" class="ban-rule" style="list-style: none; padding-left: 16px;">💪 Вас никто не заставляет покупать дино — уважайте чужой труд и оплачивайте соответствующую цену, либо выводите статы САМОСТОЯТЕЛЬНО!</li>
+            <li id="rule7" class="ban-rule" style="list-style: none; padding-left: 16px;">🥚 Цена яйца равна цене некастрированного дино. Статы дино в яйце можно посмотреть в инкубаторе.</li>
+            <li id="rule8" class="ban-rule" style="list-style: none; padding-left: 16px;">🚫 Передавать/продавать/покупать "спарку" дино ЗАПРЕЩЕНО.</li>
         </ul>
     </div>
 </div>
@@ -787,6 +789,8 @@ select option {
             creatureNotListed: "Дино нет в списке",
             rule5: "⚠️ За нарушение минимальной цены или бесплатную передачу динозавра другому игроку вне вашего трайба может быть выдан бан.",
             rule6: "💪 Вас никто не заставляет покупать дино — уважайте чужой труд и оплачивайте соответствующую цену, либо выводите статы САМОСТОЯТЕЛЬНО!",
+            rule7: "🥚 Цена яйца равна цене некастрированного дино. Статы дино в яйце можно посмотреть в инкубаторе.",
+            rule8: "🚫 Передавать/продавать/покупать \"спарку\" дино ЗАПРЕЩЕНО.",
             dinoLabel: "🦕 Существо",
             currencyLabel: "💱 Валюта",
             labelHealth: "❤️ Здоровье",
@@ -815,6 +819,8 @@ select option {
             creatureNotListed: "Dino not listed",
             rule5: "⚠️ Violation of the minimum price or giving away a dinosaur for free to another player outside your tribe may result in a ban!",
             rule6: "💪 No one forces you to buy a dino — respect other people's work and pay the appropriate price, or breed the stats YOURSELF!",
+            rule7: "🥚 The price of an egg equals the price of an unneutered dino. You can see the stats of the dino in the egg in the incubator.",
+            rule8: "🚫 Transferring/selling/buying \"sparked\" dinos is FORBIDDEN.",
             dinoLabel: "🦕 Creature",
             currencyLabel: "💱 Currency",
             labelHealth: "❤️ Health",
@@ -870,14 +876,15 @@ select option {
         currencySelect.querySelector('option[value="points"]').textContent = 'Points';
         currencySelect.querySelector('option[value="element"]').textContent = (lang === 'en') ? 'Element' : 'Элемент';
         const ruleItems = document.querySelectorAll("#rulesList li");
-        if (ruleItems.length >= 6) {
+        if (ruleItems.length >= 8) {
             ruleItems[0].textContent = t.rule1;
             ruleItems[1].textContent = t.rule2;
             ruleItems[2].textContent = t.rule3;
-            // rule4 теперь использует правильный перевод из translations
             ruleItems[3].innerHTML = t.rule4;
             ruleItems[4].innerHTML = t.rule5;
             ruleItems[5].innerHTML = t.rule6;
+            ruleItems[6].innerHTML = t.rule7;
+            ruleItems[7].innerHTML = t.rule8;
         }
         populateSelect(lang);
         calculate();
