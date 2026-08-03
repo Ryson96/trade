@@ -25,10 +25,10 @@
     --warning: #dc2626;
     --warning-bg: #fff1f2;
     --shadow: 0 22px 45px -25px rgba(16, 45, 102, 0.35), 0 8px 30px -20px rgba(37, 99, 235, 0.15);
-    --color-coeff5: #1d8a45;
-    --color-coeff10: #2563eb;
-    --color-coeff15: #d97706;
-    --color-coeff20: #b91c1c;
+    --color-coeff2: #1d8a45;
+    --color-coeff4: #2563eb;
+    --color-coeff6: #d97706;
+    --color-coeff8: #b91c1c;
     --ban-bg: rgba(220, 38, 38, 0.12);
 }
 
@@ -45,10 +45,10 @@
     --warning: #f87171;
     --warning-bg: #3f1f2a;
     --shadow: 0 22px 45px -25px rgba(0, 0, 0, 0.6), 0 8px 30px -20px rgba(96, 165, 250, 0.12);
-    --color-coeff5: #4ade80;
-    --color-coeff10: #60a5fa;
-    --color-coeff15: #facc15;
-    --color-coeff20: #fb7185;
+    --color-coeff2: #4ade80;
+    --color-coeff4: #60a5fa;
+    --color-coeff6: #facc15;
+    --color-coeff8: #fb7185;
     --ban-bg: rgba(248, 113, 113, 0.18);
 }
 
@@ -361,6 +361,11 @@ select option {
     opacity: 0.85;
 }
 
+.coeff-2 { color: var(--color-coeff2); font-weight: 700; }
+.coeff-4 { color: var(--color-coeff4); font-weight: 700; }
+.coeff-6 { color: var(--color-coeff6); font-weight: 700; }
+.coeff-8 { color: var(--color-coeff8); font-weight: 700; }
+
 @media (max-width: 860px) {
     .grid-stats {
         grid-template-columns: repeat(2, minmax(180px, 1fr));
@@ -466,8 +471,9 @@ select option {
             <li id="rule1">Цена калькулятора — базовая рекомендация для продажи динозавра. Можно ставить дороже, но не ниже.</li>
             <li id="rule2">Валюта — Points (очки за стат).</li>
             <li id="rule3">Некастраты с любым статом ≥100 ⛔ строго запрещены к продаже.</li>
-            <li id="rule4">Каждое существо имеет базовый коэффициент 2/4/6/8 Points за 1 стат; итоговая цена = эффективное значение статов × коэфф. × ⅔.</li>
+            <li id="rule4">Каждое существо имеет базовый коэффициент <span class="coeff-2">2</span>/<span class="coeff-4">4</span>/<span class="coeff-6">6</span>/<span class="coeff-8">8</span> Points за 1 стат; итоговая цена = эффективное значение статов × коэфф. × ⅔.</li>
             <li id="rule5" class="ban-rule" style="list-style: none; padding-left: 16px;">⚠️ За нарушение минимальной цены или бесплатную передачу динозавра другому игроку вне вашего трайба может быть выдан бан.</li>
+            <li id="rule6" class="ban-rule" style="list-style: none; padding-left: 16px;">💪 Вас никто не заставляет покупать дино — уважайте чужой труд и оплачивайте соответствующую цену, либо выводите статы САМОСТОЯТЕЛЬНО!</li>
         </ul>
     </div>
 </div>
@@ -683,10 +689,10 @@ select option {
         items.forEach(item => {
             const coeff = creaturesData.get(item.value);
             let color = '';
-            if (coeff === 2) color = 'var(--color-coeff5)';
-            else if (coeff === 4) color = 'var(--color-coeff10)';
-            else if (coeff === 6) color = 'var(--color-coeff15)';
-            else color = 'var(--color-coeff20)';
+            if (coeff === 2) color = 'var(--color-coeff2)';
+            else if (coeff === 4) color = 'var(--color-coeff4)';
+            else if (coeff === 6) color = 'var(--color-coeff6)';
+            else color = 'var(--color-coeff8)';
             const option = document.createElement('option');
             option.value = item.value;
             option.textContent = item.text;
@@ -780,6 +786,7 @@ select option {
             creaturePlaceholder: "Тип не выбран",
             creatureNotListed: "Дино нет в списке",
             rule5: "⚠️ За нарушение минимальной цены или бесплатную передачу динозавра другому игроку вне вашего трайба может быть выдан бан.",
+            rule6: "💪 Вас никто не заставляет покупать дино — уважайте чужой труд и оплачивайте соответствующую цену, либо выводите статы САМОСТОЯТЕЛЬНО!",
             dinoLabel: "🦕 Существо",
             currencyLabel: "💱 Валюта",
             labelHealth: "❤️ Здоровье",
@@ -807,6 +814,7 @@ select option {
             creaturePlaceholder: "No type selected",
             creatureNotListed: "Dino not listed",
             rule5: "⚠️ Violation of the minimum price or giving away a dinosaur for free to another player outside your tribe may result in a ban!",
+            rule6: "💪 No one forces you to buy a dino — respect other people's work and pay the appropriate price, or breed the stats YOURSELF!",
             dinoLabel: "🦕 Creature",
             currencyLabel: "💱 Currency",
             labelHealth: "❤️ Health",
@@ -862,12 +870,14 @@ select option {
         currencySelect.querySelector('option[value="points"]').textContent = 'Points';
         currencySelect.querySelector('option[value="element"]').textContent = (lang === 'en') ? 'Element' : 'Элемент';
         const ruleItems = document.querySelectorAll("#rulesList li");
-        if (ruleItems.length >= 5) {
+        if (ruleItems.length >= 6) {
             ruleItems[0].textContent = t.rule1;
             ruleItems[1].textContent = t.rule2;
             ruleItems[2].textContent = t.rule3;
-            ruleItems[3].textContent = t.rule4;
+            // rule4 содержит HTML с цветными цифрами
+            ruleItems[3].innerHTML = `Каждое существо имеет базовый коэффициент <span class="coeff-2">2</span>/<span class="coeff-4">4</span>/<span class="coeff-6">6</span>/<span class="coeff-8">8</span> Points за 1 стат; итоговая цена = эффективное значение статов × коэфф. × ⅔.`;
             ruleItems[4].innerHTML = t.rule5;
+            ruleItems[5].innerHTML = t.rule6;
         }
         populateSelect(lang);
         calculate();
