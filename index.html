@@ -471,7 +471,7 @@ select option {
             <li id="rule1">Цена калькулятора — базовая рекомендация для продажи динозавра. Можно ставить дороже, но не ниже.</li>
             <li id="rule2">Валюта — Points (очки за стат).</li>
             <li id="rule3">Некастраты с любым статом ≥100 ⛔ строго запрещены к продаже.</li>
-            <li id="rule4">Каждое существо имеет базовый коэффициент <span class="coeff-1">1</span>/<span class="coeff-2">2</span>/<span class="coeff-3">3</span>/<span class="coeff-4">4</span> Points за 1 стат; итоговая цена = эффективное значение статов × коэфф. × ⅔.</li>
+            <li id="rule4">Каждое существо имеет базовый коэффициент <span class="coeff-1">0.1</span>/<span class="coeff-2">0.2</span>/<span class="coeff-3">0.3</span>/<span class="coeff-4">0.4</span> Points за 1 стат; итоговая цена = эффективное значение статов × коэфф. × ⅔.</li>
             <li id="rule5" class="ban-rule" style="list-style: none; padding-left: 16px;">⚠️ За нарушение минимальной цены или бесплатную передачу динозавра другому игроку вне вашего трайба может быть выдан бан.</li>
             <li id="rule6" class="ban-rule" style="list-style: none; padding-left: 16px;">💪 Вас никто не заставляет покупать дино — уважайте чужой труд и оплачивайте соответствующую цену, либо выводите статы САМОСТОЯТЕЛЬНО!</li>
             <li id="rule7" class="ban-rule" style="list-style: none; padding-left: 16px;">🥚 Цена яйца равна цене некастрированного дино. Статы дино в яйце можно посмотреть в инкубаторе.</li>
@@ -481,7 +481,7 @@ select option {
 </div>
 
 <script>
-    // ---------- НОВЫЕ КОЭФФИЦИЕНТЫ: 1, 2, 3, 4 ----------
+    // ---------- НОВЫЕ КОЭФФИЦИЕНТЫ: 0.1, 0.2, 0.3, 0.4 ----------
     const COEFF_1_LIST = [
         "Археоптерикс", "Ахатина", "Выдра", "Гесперорнис", "Гриф", "Дилофозавр", "Диморфодон", "Додо", "Ихтиорнис",
         "Кайруку", "Компсогнат", "Королева пчёл", "Листрозавр", "Мезопитек", "Микрораптор", "Ноглин", "Овираптор", "Пегомастакс",
@@ -510,7 +510,7 @@ select option {
 
     // Маппинг русских названий на английские
     const creatureNameEn = new Map();
-    // 1 point
+    // 0.1 point
     creatureNameEn.set("Археоптерикс", "Archaeopteryx");
     creatureNameEn.set("Ахатина", "Achatina");
     creatureNameEn.set("Выдра", "Otter");
@@ -534,7 +534,7 @@ select option {
     creatureNameEn.set("Скарабей", "Scarab");
     creatureNameEn.set("Яснокрыл", "Glowtail");
     creatureNameEn.set("Ястреб фьердов", "Fjordhawk");
-    // 2 points
+    // 0.2 points
     creatureNameEn.set("Аллозавр", "Allosaurus");
     creatureNameEn.set("Амаргазавр", "Amargasaurus");
     creatureNameEn.set("Аранео", "Araneo");
@@ -595,7 +595,7 @@ select option {
     creatureNameEn.set("Шипастый дракон", "Thorny Dragon");
     creatureNameEn.set("Эквус", "Equus");
     creatureNameEn.set("Электрофорус", "Electrophorus");
-    // 3 points
+    // 0.3 points
     creatureNameEn.set("Анкилозавр", "Ankylosaurus");
     creatureNameEn.set("Бладсталкер", "Bloodstalker");
     creatureNameEn.set("Богомол", "Mantis");
@@ -630,7 +630,7 @@ select option {
     creatureNameEn.set("Ферокс", "Ferox");
     creatureNameEn.set("Шерстистый носорог", "Woolly Rhino");
     creatureNameEn.set("Эндрюсарх", "Andrewsarchus");
-    // 4 points
+    // 0.4 points
     creatureNameEn.set("Астроцетус", "Astrocetus");
     creatureNameEn.set("Базилозавр", "Basilosaurus");
     creatureNameEn.set("Гача", "Gacha");
@@ -645,12 +645,12 @@ select option {
     creatureNameEn.set("Тусотеутис", "Tusoteuthis");
     creatureNameEn.set("Ютираннус", "Yutyrannus");
 
-    // Сборная карта всех существ {русское имя: coeff} (Points за 1 стат) — теперь 1,2,3,4
+    // Сборная карта всех существ {русское имя: coeff} — теперь 0.1, 0.2, 0.3, 0.4
     const creaturesData = new Map();
-    COEFF_1_LIST.forEach(name => creaturesData.set(name, 1));
-    COEFF_2_LIST.forEach(name => creaturesData.set(name, 2));
-    COEFF_3_LIST.forEach(name => creaturesData.set(name, 3));
-    COEFF_4_LIST.forEach(name => creaturesData.set(name, 4));
+    COEFF_1_LIST.forEach(name => creaturesData.set(name, 0.1));
+    COEFF_2_LIST.forEach(name => creaturesData.set(name, 0.2));
+    COEFF_3_LIST.forEach(name => creaturesData.set(name, 0.3));
+    COEFF_4_LIST.forEach(name => creaturesData.set(name, 0.4));
 
     function getDisplayName(russianName, lang) {
         if (lang === 'en' && creatureNameEn.has(russianName)) {
@@ -662,9 +662,9 @@ select option {
     function getSortedCreatureNames(lang) {
         const groups = [[], [], [], []];
         for (let [name, coeff] of creaturesData.entries()) {
-            if (coeff === 1) groups[0].push(name);
-            else if (coeff === 2) groups[1].push(name);
-            else if (coeff === 3) groups[2].push(name);
+            if (coeff === 0.1) groups[0].push(name);
+            else if (coeff === 0.2) groups[1].push(name);
+            else if (coeff === 0.3) groups[2].push(name);
             else groups[3].push(name);
         }
         groups.forEach(g => g.sort((a,b) => a.localeCompare(b)));
@@ -690,9 +690,9 @@ select option {
         items.forEach(item => {
             const coeff = creaturesData.get(item.value);
             let color = '';
-            if (coeff === 1) color = 'var(--color-coeff1)';
-            else if (coeff === 2) color = 'var(--color-coeff2)';
-            else if (coeff === 3) color = 'var(--color-coeff3)';
+            if (coeff === 0.1) color = 'var(--color-coeff1)';
+            else if (coeff === 0.2) color = 'var(--color-coeff2)';
+            else if (coeff === 0.3) color = 'var(--color-coeff3)';
             else color = 'var(--color-coeff4)';
             const option = document.createElement('option');
             option.value = item.value;
@@ -717,12 +717,12 @@ select option {
         document.getElementById("totalValue").textContent = totalPoints;
 
         const selected = document.getElementById("creatureSelect").value;
-        const maxCoeff = 4;
-        const minCoeff = 1;
+        const minCoeff = 0.1;
+        const maxCoeff = 0.4;
         const coeff = selected === 'not-listed'
             ? minCoeff
             : selected
-                ? (creaturesData.get(selected) || 1)
+                ? (creaturesData.get(selected) || 0.1)
                 : maxCoeff;
         const currency = document.getElementById("currencySelect").value;
         // Формула: effectivePoints = сумма статов ^ 2.2 / 50
@@ -784,7 +784,7 @@ select option {
             rule1: "Цена калькулятора — базовая рекомендация для продажи динозавра. Можно ставить дороже, но не ниже.",
             rule2: "Валюта — Points или Element (Points = Element × 5).",
             rule3: "Некастраты с любым статом ≥100 ⛔ строго запрещены к продаже.",
-            rule4: "Каждое существо имеет базовый коэффициент <span class=\"coeff-1\">1</span>/<span class=\"coeff-2\">2</span>/<span class=\"coeff-3\">3</span>/<span class=\"coeff-4\">4</span> Points за 1 стат; итоговая цена = эффективное значение статов × коэфф. × ⅔.",
+            rule4: "Каждое существо имеет базовый коэффициент <span class=\"coeff-1\">0.1</span>/<span class=\"coeff-2\">0.2</span>/<span class=\"coeff-3\">0.3</span>/<span class=\"coeff-4\">0.4</span> Points за 1 стат; итоговая цена = эффективное значение статов × коэфф. × ⅔.",
             creaturePlaceholder: "Тип не выбран",
             creatureNotListed: "Дино нет в списке",
             rule5: "⚠️ За нарушение минимальной цены или бесплатную передачу динозавра другому игроку вне вашего трайба может быть выдан бан.",
@@ -811,7 +811,7 @@ select option {
             rule1: "Calculator price is a base recommendation for selling a dinosaur. You can price higher, but not lower.",
             rule2: "Currency — Points or Element (Points = Element × 5).",
             rule3: "Unneutered with any stat ≥100 ⛔ is strictly forbidden for sale.",
-            rule4: "Each creature has a base coefficient <span class=\"coeff-1\">1</span>/<span class=\"coeff-2\">2</span>/<span class=\"coeff-3\">3</span>/<span class=\"coeff-4\">4</span> Points per stat; final price = effective stat value × coeff × ⅔.",
+            rule4: "Each creature has a base coefficient <span class=\"coeff-1\">0.1</span>/<span class=\"coeff-2\">0.2</span>/<span class=\"coeff-3\">0.3</span>/<span class=\"coeff-4\">0.4</span> Points per stat; final price = effective stat value × coeff × ⅔.",
             creaturePlaceholder: "No type selected",
             creatureNotListed: "Dino not listed",
             rule5: "⚠️ Violation of the minimum price or giving away a dinosaur for free to another player outside your tribe may result in a ban!",
